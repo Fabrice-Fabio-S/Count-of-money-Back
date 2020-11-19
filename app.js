@@ -1,5 +1,6 @@
 
 const express                   = require('express');
+const apiRouter                 = require('./apiRouter').router;
 const bodyParser                = require('body-parser');
 const port = process.env.PORT || 3000;
 const mongoose  = require('mongoose');
@@ -18,4 +19,7 @@ mongoose.connect( process.env.MONGO_DB_URL, {useNewUrlParser: true, useUnifiedTo
 app.get('/test', (req,res) => {
     res.send('test')
 })
+
+app.use('/api', apiRouter);
+
 app.listen(port,() => console.log(`Listen on : ${port}`));
