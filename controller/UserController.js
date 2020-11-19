@@ -4,6 +4,7 @@ const UserModel             = require('./../models/UserModel');
 const Utils                 = require('../config/Utils');
 const randomstring          = require("randomstring");
 const config                = require("../config/config");
+const validator             = require("email-validator");
 
 require('dotenv').config();
 
@@ -15,77 +16,88 @@ module.exports = {
 
         console.log("lastname : "+lastname+" firstname : "+firstname+" email : "+email+" password : "+password);
         // Check email
-        UserModel.getUserByEmail(email).then( user => {
-            // if user with this email exists return 403
-            if (user) {
-                // user already exist
-                return Utils.getJsonResponse(403, 'User already exist', {}, res);
-            } else {
-                const userInstance = new UserModel();
-                bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(password, salt, async (err, hash) => {
-                        if (err) {
-                            return Utils.getJsonResponse(404, 'Error hash pwd', {}, res);
-                        } else {
-                            userInstance.email = email;
-                            userInstance.lastname = lastname;
-                            userInstance.firstname = firstname;
-                            userInstance.password = hash;
-                            userInstance.save()
-                                .then( result => {
-                                    return Utils.getJsonResponse(200, '', userInstance, res);
-                                })
-                                .catch(e => {
-                                    console.log('User not save ', e);
-                                    return Utils.getJsonResponse(500, 'error', {}, res);
-                                });
-                        }
-                    })
-                });
-            }
-        });
+        if(validator.validate(email))
+        {
+            UserModel.getUserByEmail(email).then( user => {
+                // if user with this email exists return 403
+                if (user) {
+                    // user already exist
+                    return Utils.getJsonResponse(403, 'User already exist', {}, res);
+                } else {
+                    const userInstance = new UserModel();
+                    bcrypt.genSalt(10, (err, salt) => {
+                        bcrypt.hash(password, salt, async (err, hash) => {
+                            if (err) {
+                                return Utils.getJsonResponse(404, 'Error hash pwd', {}, res);
+                            } else {
+                                userInstance.email = email;
+                                userInstance.lastname = lastname;
+                                userInstance.firstname = firstname;
+                                userInstance.password = hash;
+                                userInstance.save()
+                                    .then( result => {
+                                        return Utils.getJsonResponse(200, '', userInstance, res);
+                                    })
+                                    .catch(e => {
+                                        console.log('User not save ', e);
+                                        return Utils.getJsonResponse(500, 'error', {}, res);
+                                    });
+                            }
+                        })
+                    });
+                }
+            });
+        }
+        else{
+            return Utils.getJsonResponse(401,'Wrong Email format', {}, res);
+        }
     },
 
     // login
     login:  async (req, res) => {
         const {email, password} = req.body;
 
-        UserModel.getUserByEmail(email)
-            .then( user => {
-                if(user) {
-                    UserModel.comparePassword(password, user.password, function(err, isMatch) {
-                        if (err) { return Utils.getJsonResponse(500,'Internal error', {}, res); }
-                        if (isMatch) {
-                            const token = jwt.sign(
-                                { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
-                                config.secret);
+        if(validator.validate(email)){
+            UserModel.getUserByEmail(email)
+                .then( user => {
+                    if(user) {
+                        UserModel.comparePassword(password, user.password, function(err, isMatch) {
+                            if (err) { return Utils.getJsonResponse(500,'Internal error', {}, res); }
+                            if (isMatch) {
+                                const token = jwt.sign(
+                                    { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
+                                    config.secret);
 
-                            const data = {
-                                email: user.email,
-                                lastname: user.lastname,
-                                firstname: user.firstname,
-                                token: token,
-                            };
+                                const data = {
+                                    email: user.email,
+                                    lastname: user.lastname,
+                                    firstname: user.firstname,
+                                    token: token,
+                                };
 
-                            UserModel.setLastToken(user.email,token)
-                                .then( result => {
-                                    return Utils.getJsonResponse(200,'', data, res);})
-                                .catch( err => {
-                                    return Utils.getJsonResponse(404,'Can not set user token', {}, res);})
-                        } else {
-                            // Invalid password
-                            return Utils.getJsonResponse(401,'Wrong Password', {}, res);
-                        }
-                    });
-                }
-                else {
-                    // This email is not found
-                    return Utils.getJsonResponse(404,'Email not exits', {}, res);
-                }
-            })
-            .catch( err => {
-                return Utils.getJsonResponse(500,'Internal error', {}, res);
-            });
+                                UserModel.setLastToken(user.email,token)
+                                    .then( result => {
+                                        return Utils.getJsonResponse(200,'', data, res);})
+                                    .catch( err => {
+                                        return Utils.getJsonResponse(404,'Can not set user token', {}, res);})
+                            } else {
+                                // Invalid password
+                                return Utils.getJsonResponse(401,'Wrong Password', {}, res);
+                            }
+                        });
+                    }
+                    else {
+                        // This email is not found
+                        return Utils.getJsonResponse(404,'Email not exits', {}, res);
+                    }
+                })
+                .catch( err => {
+                    return Utils.getJsonResponse(500,'Internal error', {}, res);
+                });
+        }
+        else{
+            return Utils.getJsonResponse(401,'Wrong Email format', {}, res);
+        }
     },
 
 };
