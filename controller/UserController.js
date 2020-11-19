@@ -7,9 +7,6 @@ const config                = require("../config/config");
 
 require('dotenv').config();
 
-
-const { body, check }   = require('express-validator/check');
-
 module.exports = {
 
     // resgiter
@@ -70,7 +67,7 @@ module.exports = {
                                 token: token,
                             };
 
-                            UserModel.setLastToken(user.phoneNumber,token)
+                            UserModel.setLastToken(user.email,token)
                                 .then( result => {
                                     return Utils.getJsonResponse(200,'', data, res);})
                                 .catch( err => {

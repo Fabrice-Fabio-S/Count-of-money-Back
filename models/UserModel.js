@@ -19,6 +19,11 @@ const UserModelSchema = mongoose.Schema(
             type: String,
             required: true
         },
+        grade: {
+            type: Number,
+            default: 0,
+            required: true
+        },
         lastJwtToken: {
             type: String,
             required: false
@@ -58,8 +63,16 @@ module.exports.comparePassword = function(userPassword, hash, callback){
 };
 
 // Set user's token
-module.exports.setLastToken = (phoneNumber, lastJwtToken) => {
-    const query = {phoneNumber: phoneNumber};
+module.exports.setLastToken = (_email, lastJwtToken) => {
+    const query = {email: _email};
     const newvalues = { $set: {lastJwtToken: lastJwtToken } };
+    return User.updateOne(query, newvalues).exec();
+};
+
+// Set user's grade
+// 0 - user lamda || 1 - admin
+module.exports.setUserGrade = (_email, _grade) => {
+    const query = {email: _email};
+    const newvalues = { $set: {grade: _grade }};
     return User.updateOne(query, newvalues).exec();
 };
