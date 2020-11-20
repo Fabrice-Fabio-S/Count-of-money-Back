@@ -9,6 +9,7 @@ exports.router = (function() {
 
     apiRouter.route('/register').post(UserController.register);
     apiRouter.route('/login').post(UserController.login);
+    apiRouter.route('/users/profil').get(UserController.getProfile);
 
     return apiRouter;
 })();
