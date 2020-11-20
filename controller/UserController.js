@@ -1,10 +1,8 @@
-const jwt                   = require('jsonwebtoken');
 const bcrypt                = require('bcryptjs');
 const UserModel             = require('./../models/UserModel');
 const Utils                 = require('../config/Utils');
-const randomstring          = require("randomstring");
-const config                = require("../config/config");
 const validator             = require("email-validator");
+const passport = require("passport");
 
 require('dotenv').config();
 
@@ -55,49 +53,42 @@ module.exports = {
 
     // login
     login:  async (req, res) => {
-        const {email, password} = req.body;
-
-        if(validator.validate(email)){
-            UserModel.getUserByEmail(email)
-                .then( user => {
-                    if(user) {
-                        UserModel.comparePassword(password, user.password, function(err, isMatch) {
-                            if (err) { return Utils.getJsonResponse(500,'Internal error', {}, res); }
-                            if (isMatch) {
-                                const token = jwt.sign(
-                                    { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
-                                    config.secret);
-
-                                const data = {
-                                    email: user.email,
-                                    lastname: user.lastname,
-                                    firstname: user.firstname,
-                                    token: token,
-                                };
-
-                                UserModel.setLastToken(user.email,token)
-                                    .then( result => {
-                                        return Utils.getJsonResponse(200,'', data, res);})
-                                    .catch( err => {
-                                        return Utils.getJsonResponse(404,'Can not set user token', {}, res);})
-                            } else {
-                                // Invalid password
-                                return Utils.getJsonResponse(401,'Wrong Password', {}, res);
-                            }
-                        });
-                    }
-                    else {
-                        // This email is not found
-                        return Utils.getJsonResponse(404,'Email not exits', {}, res);
-                    }
-                })
-                .catch( err => {
-                    return Utils.getJsonResponse(500,'Internal error', {}, res);
-                });
-        }
-        else{
-            return Utils.getJsonResponse(401,'Wrong Email format', {}, res);
-        }
+        passport.authenticate('local',
+            { session: false},
+            (err,user,info) => {
+                if(err){
+                    return Utils.getJsonResponse(500,err, {}, res);
+                }
+                if (info){
+                    console.log(info.statusCode + " -> "+info.message);
+                    return Utils.getJsonResponse(info.statusCode,info.message, {}, res);
+                }
+                else{
+                    return Utils.getJsonResponse(200,'', user, res);
+                }
+            }
+        )(req,res);
     },
+
+    // get userinfo
+    getProfile: async (req,res)=>{
+        const id = req.query.id;
+        console.log("params : "+JSON.stringify(req.query,null,4));
+        const verifyToken = Utils.verifyToken(req,res,(err,tokenInfo)=>{
+            if(err){
+                return Utils.getJsonResponse(500,'Error token', {}, res);
+            }
+            else{
+                UserModel.getUserById(id)
+                    .then( user => {
+                        console.log("user : "+id+" data : "+user);
+                        return Utils.getJsonResponse(200,'', user, res);
+                    })
+                    .catch(err => {
+                        return Utils.getJsonResponse(404,'User not found', {}, res);
+                    })
+            }
+        });
+    }
 
 };
