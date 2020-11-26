@@ -74,7 +74,7 @@ module.exports = {
     getProfile: async (req,res)=>{
         const id = req.query.id;
         console.log("params : "+JSON.stringify(req.query,null,4));
-        const verifyToken = Utils.verifyToken(req,res,(err,tokenInfo)=>{
+        Utils.verifyToken(req,res,(err,tokenInfo)=>{
             if(err){
                 return Utils.getJsonResponse(500,'Error token', {}, res);
             }

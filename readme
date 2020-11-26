@@ -1,0 +1,27 @@
+```
+1 -
+RequestType : Post
+Route : api/register
+Params :
+lastname
+firstname
+email
+password
+
+2 -
+RequestType
+Post
+Route :
+api/login
+Params :
+email
+password
+
+3 -
+RequestType
+Get
+Route :
+api/users/profil
+Params :
+id
+```
