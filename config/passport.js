@@ -26,6 +26,7 @@ module.exports = function(passport){
                                         config.secret);
 
                                     const data = {
+                                        userId: user._id,
                                         email: user.email,
                                         lastname: user.lastname,
                                         firstname: user.firstname,

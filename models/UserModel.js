@@ -28,6 +28,10 @@ const UserModelSchema = mongoose.Schema(
             type: String,
             required: false
         },
+        cryptoList: {
+            type: [String],
+            required: false,
+        }
     },
 );
 
@@ -76,3 +80,18 @@ module.exports.setUserGrade = (_email, _grade) => {
     const newvalues = { $set: {grade: _grade }};
     return User.updateOne(query, newvalues).exec();
 };
+
+// Update user info
+module.exports.updateParams = (userId,email,lastname,firstname) => {
+    const query = {_id: userId};
+    const newvalues = { $set: {email: email, lastname: lastname, firstname:firstname } };
+    return User.updateOne(query, newvalues).exec();
+};
+
+// Update cryptoList
+module.exports.setCryptoList = (userId, crypto)=>{
+    console.log("new pseudo : "+crypto);
+    const query = {_id: userId};
+    const newvalues = {$addToSet: {cryptoList: crypto}};
+    return User.updateOne(query, newvalues)
+}

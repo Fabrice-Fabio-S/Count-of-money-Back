@@ -89,6 +89,55 @@ module.exports = {
                     })
             }
         });
+    },
+
+    // update user info
+    updateUserInfo: async (req,res)=>{
+        const {userId, email, lastname, firstname} = req.query;
+        Utils.verifyToken(req,res,(err,tokenInfo)=>{
+            if(err){
+                return Utils.getJsonResponse(500,'Error token', {}, res);
+            }
+            else{
+                UserModel.getUserByEmail(email)
+                    .then( user => {
+                    // if user with this email exists return 403
+                    if (user) {
+                        // user already exist
+                        return Utils.getJsonResponse(403, 'User already exist', {}, res);
+                    } else {
+                        UserModel.updateParams(userId, email, lastname,firstname)
+                            .then( result => {
+                                console.log("id : "+userId+" lastname : "+lastname);
+                                return Utils.getJsonResponse(200,'', {message: "User info has been update"}, res);
+                            })
+                            .catch(err => {
+                                return Utils.getJsonResponse(404,'User not found', {}, res);
+                            })
+                    }
+                });
+            }
+        });
+    },
+
+    // update crypto info
+    updateCryptoList: async (req,res)=>{
+        const {userId,crypto} = req.query;
+        Utils.verifyToken(req,res,(err,tokenInfo)=>{
+            if(err){
+                return Utils.getJsonResponse(500,'Error token', {}, res);
+            }
+            else{
+                UserModel.setCryptoList(userId,crypto)
+                    .then( result => {
+                        console.log(userId + ": crypto : "+crypto);
+                        return Utils.getJsonResponse(200,'', {message: "Crypto list has been update"}, res);
+                    })
+                    .catch(err => {
+                        return Utils.getJsonResponse(404,'User not found', {}, res);
+                    })
+            }
+        });
     }
 
 };
