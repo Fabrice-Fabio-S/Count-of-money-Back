@@ -12,6 +12,8 @@ exports.router = (function() {
     apiRouter.route('/users/profil').get(UserController.getProfile);
     apiRouter.route('/users/update/info').get(UserController.updateUserInfo);
     apiRouter.route('/users/update/crypto').get(UserController.updateCryptoList);
+    // apiRouter.route('/users/auth/google').get(UserController.googleConnection);
+    // apiRouter.route('/auth/google/callback').get(UserController.googleCallback);
 
     return apiRouter;
 })();

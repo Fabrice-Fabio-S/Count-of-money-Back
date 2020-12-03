@@ -70,6 +70,18 @@ module.exports = {
         )(req,res);
     },
 
+    googleConnection: async (req,res)=>{
+        console.log("step-1");
+        passport.authenticate('google',
+            {scope: ['profile','email']}
+        )(req,res);
+    },
+
+    googleCallback: async (req,res)=>{
+        console.log("step-3");
+        return res.json({test:'test'});
+    },
+
     // get userinfo
     getProfile: async (req,res)=>{
         const id = req.query.id;
