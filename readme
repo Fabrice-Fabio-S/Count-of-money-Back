@@ -24,4 +24,11 @@ Route :
 api/users/profil
 Params :
 id
+
+4 -
+RequestType
+Get
+api/articles
+Params :
+
 ```
