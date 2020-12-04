@@ -47,14 +47,6 @@ app.get('/test', (req,res) => {
     res.send('test')
 });
 
-app.get('/api/users/auth/google',passport.authenticate('google',
-    {scope: ['profile','email']}
-));
-
-app.get('/api/auth/google/callback', passport.authenticate('google', {failureRedirect: '/test'}), (req,res) => {
-    return res.json({test:'test'});
-})
-
 app.use('/api', apiRouter);
 
 app.listen(port,() => console.log(`Listen on : ${port}`));

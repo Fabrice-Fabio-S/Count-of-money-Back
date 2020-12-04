@@ -73,13 +73,17 @@ module.exports = {
     googleConnection: async (req,res)=>{
         console.log("step-1");
         passport.authenticate('google',
-            {scope: ['profile','email']}
+            {scope: ['profile','email']},
+            (err,response)=>{
+                console.log("User : "+response);
+            }
         )(req,res);
     },
 
     googleCallback: async (req,res)=>{
         console.log("step-3");
-        return res.json({test:'test'});
+        return res.redirect('https://www.linkedin.com/')
+        // return res.json({test: "test"})
     },
 
     // get userinfo

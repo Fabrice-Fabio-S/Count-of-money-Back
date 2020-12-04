@@ -1,27 +1,29 @@
 ```
+PORT : 5000
 1 -
 RequestType : Post
 Route : api/register
 Params :
-lastname
-firstname
-email
-password
+lastname - firstname - email - password
 
 2 -
-RequestType
-Post
-Route :
-api/login
+RequestType : Post
+Route : api/login
 Params :
-email
-password
+email - password
 
 3 -
-RequestType
-Get
-Route :
-api/users/profil
-Params :
-id
+RequestType : Get
+Route : api/users/profil
+Params : id
+
+4 -
+RequestType : Get
+Route : api/users/auth/google
+
+5 -
+RequestType : Get
+Route : api/auth/google/callback
+
+
 ```
