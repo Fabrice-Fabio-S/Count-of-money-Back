@@ -21,9 +21,5 @@ Params : id
 RequestType : Get
 Route : api/users/auth/google
 
-5 -
-RequestType : Get
-Route : api/auth/google/callback
-
 
 ```

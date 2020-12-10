@@ -3,6 +3,9 @@ const UserModel             = require('./../models/UserModel');
 const Utils                 = require('../config/Utils');
 const validator             = require("email-validator");
 const passport = require("passport");
+const randomstring = require("randomstring");
+const config = require("../config/config");
+const jwt = require("jsonwebtoken");
 
 require('dotenv').config();
 
@@ -82,7 +85,10 @@ module.exports = {
 
     googleCallback: async (req,res)=>{
         console.log("step-3");
-        return res.redirect('https://www.linkedin.com/')
+        const token = jwt.sign(
+            { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
+            config.secret);
+        return Utils.getJsonResponse(200, '', {token: token}, res);
         // return res.json({test: "test"})
     },
 

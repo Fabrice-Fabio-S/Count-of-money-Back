@@ -2,7 +2,7 @@
 const express                   = require('express');
 const apiRouter                 = require('./apiRouter').router;
 const bodyParser                = require('body-parser');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 const mongoose  = require('mongoose');
 const passport = require("passport");
 const cors = require("cors");
