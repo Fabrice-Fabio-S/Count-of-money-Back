@@ -84,11 +84,26 @@ module.exports = {
     },
 
     googleCallback: async (req,res)=>{
-        console.log("step-3");
-        const token = jwt.sign(
-            { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
-            config.secret);
-        return Utils.getJsonResponse(200, '', {token: token}, res);
+        passport.authenticate('google',
+            {scope: ['profile','email']},
+            (err,response)=>{
+                console.log("User : "+JSON.stringify(response,null,4));
+                console.log("step-3 : "+response.displayName+ " "+response.emails[0].value);
+                const token = jwt.sign(
+                    { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
+                    config.secret);
+                // const name = response.displayName;
+                // const email = response.emails[0].value;
+                const data = {
+                    // name: name,
+                    // email: email,
+                    token: token,
+                };
+
+                return Utils.getJsonResponse(200, '', data, res);
+
+            }
+        )(req,res);
         // return res.json({test: "test"})
     },
 

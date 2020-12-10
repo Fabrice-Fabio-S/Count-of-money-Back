@@ -71,10 +71,12 @@ module.exports = function(passport){
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.CALLBACK_URL
+        callbackURL: process.env.CALLBACK_URL,
+        passReToCallback: true
     },
-        function (accessToken, refreshToken, profile, done) {
-            console.log("step-2");
+        function (request, accessToken, refreshToken, profile, done) {
+            console.log("step-2 : "+JSON.stringify(profile,null,4));
             return done(null, profile);
-        }))
+        })
+    )
 }
