@@ -2,6 +2,7 @@
 
 const express                   = require('express');
 const UserController             = require('./controller/UserController');
+const RssController = require("./controller/RssController");
 
 
 exports.router = (function() {
