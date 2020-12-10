@@ -2,7 +2,6 @@
 
 const express                   = require('express');
 const UserController             = require('./controller/UserController');
-const CryptoController = require("./controller/CryptoController");
 
 
 exports.router = (function() {
@@ -15,7 +14,7 @@ exports.router = (function() {
     apiRouter.route('/users/update/crypto').get(UserController.updateCryptoList);
     apiRouter.route('/users/auth/google').get(UserController.googleConnection);
     apiRouter.route('/auth/google/callback').get(UserController.googleCallback);
-    apiRouter.route('/cryptos').get(CryptoController.fetch);
+    apiRouter.route("/articles").get(RssController.getRssFeed);
 
     return apiRouter;
 })();
