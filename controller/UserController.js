@@ -3,6 +3,10 @@ const UserModel             = require('./../models/UserModel');
 const Utils                 = require('../config/Utils');
 const validator             = require("email-validator");
 const passport = require("passport");
+const randomstring = require("randomstring");
+const config = require("../config/config");
+const jwt = require("jsonwebtoken");
+const url = require("url");
 
 require('dotenv').config();
 
@@ -68,6 +72,41 @@ module.exports = {
                 }
             }
         )(req,res);
+    },
+
+    googleConnection: async (req,res)=>{
+        console.log("step-1");
+        passport.authenticate('google',
+            {scope: ['profile','email']},
+            (err,response)=>{
+                console.log("User : "+response);
+            }
+        )(req,res);
+    },
+
+    googleCallback: async (req,res)=>{
+        passport.authenticate('google',
+            {scope: ['profile','email']},
+            (err,response)=>{
+                console.log("User : "+JSON.stringify(response,null,4));
+                console.log("step-3 : "+response.displayName+ " "+response.emails[0].value);
+                const token = jwt.sign(
+                    { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
+                    config.secret);
+
+                const name= response.displayName;
+                const email= response.emails[0].value;
+                res.header('name', name);
+                res.header('email', email);
+                res.header('token', token);
+                return res.redirect(
+                    "http://localhost:3000?name="+name+"&email="+email+"&token="+token
+                );
+                // return Utils.getJsonResponse(200, '', data, res);
+
+            }
+        )(req,res);
+        // return res.json({test: "test"})
     },
 
     // get userinfo

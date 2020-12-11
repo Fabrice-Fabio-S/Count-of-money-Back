@@ -2,9 +2,10 @@ const UserModel = require("../models/UserModel");
 const randomstring = require("randomstring");
 const jwt = require("jsonwebtoken");
 const config = require("./config");
-const LocalStrategy     = require('passport-local').Strategy;
 const validator             = require("email-validator");
-
+const LocalStrategy     = require('passport-local').Strategy;
+const GoogleStrategy     = require('passport-google-oauth20').Strategy;
+require('dotenv').config();
 
 module.exports = function(passport){
     passport.use(
@@ -60,15 +61,22 @@ module.exports = function(passport){
         })
     );
 
-    // passport.serializeUser((user, done) => {
-    //     console.log("?1");
-    //     done(null, user.id);
-    // });
-    //
-    // passport.deserializeUser((id, done) => {
-    //     console.log("?2");
-    //     UserModel.findById(id, (err, user) => {
-    //         done(err, user);
-    //     });
-    // });
+    passport.serializeUser(function(user, done) {
+        done(null, user);
+    });
+    passport.deserializeUser(function(user, done) {
+        done(null, user);
+    });
+
+    passport.use(new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.CALLBACK_URL,
+        passReToCallback: true
+    },
+        function (request, accessToken, refreshToken, profile, done) {
+            console.log("step-2 : "+JSON.stringify(profile,null,4));
+            return done(null, profile);
+        })
+    )
 }
