@@ -26,4 +26,19 @@ RequestType : Get
 Route : api/articles
 Params :
 
+6 -
+RequestType : Get
+Route : api/cryptos
+
+7 -
+RequestType : Get
+Routes : api/cryptos/:cmid
+Params : cmid
+
+8 -
+RequestType : Get
+Routes : api/cryptos/:cmid/history/:period
+Params :
+  cmid
+  period in ['hourly', 'monthly', 'daily']
 ```
