@@ -12,6 +12,8 @@ exports.router = (function() {
     apiRouter.route('/users/profil').get(UserController.getProfile);
     apiRouter.route('/users/update/info').get(UserController.updateUserInfo);
     apiRouter.route('/users/update/crypto').get(UserController.updateCryptoList);
+    apiRouter.route('/cryptos/:cmid/history/:period').get(CryptoController.sendCryptos);
+    apiRouter.route('/cryptos/:cmid').get(CryptoController.fetchOne);
     apiRouter.route('/cryptos').get(CryptoController.fetch);
 
     return apiRouter;

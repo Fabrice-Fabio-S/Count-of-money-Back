@@ -6,6 +6,8 @@ const port = process.env.PORT || 3000;
 const mongoose  = require('mongoose');
 const passport = require("passport");
 const app = express();
+const cron = require('node-cron')
+const CryptoController          = require("./controller/CryptoController");
 
 require('dotenv').config();
 require('./config/passport')(passport);
@@ -30,5 +32,12 @@ app.get('/test', (req,res) => {
 })
 
 app.use('/api', apiRouter);
+
+cron.schedule(
+    '1,31 * * * * *',
+    async () => {
+        CryptoController.intervalFetchCryptos()
+    }
+)
 
 app.listen(port,() => console.log(`Listen on : ${port}`));
