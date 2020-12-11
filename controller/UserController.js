@@ -6,6 +6,7 @@ const passport = require("passport");
 const randomstring = require("randomstring");
 const config = require("../config/config");
 const jwt = require("jsonwebtoken");
+const url = require("url");
 
 require('dotenv').config();
 
@@ -92,15 +93,16 @@ module.exports = {
                 const token = jwt.sign(
                     { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
                     config.secret);
-                // const name = response.displayName;
-                // const email = response.emails[0].value;
-                const data = {
-                    // name: name,
-                    // email: email,
-                    token: token,
-                };
 
-                return Utils.getJsonResponse(200, '', data, res);
+                const name= response.displayName;
+                const email= response.emails[0].value;
+                res.header('name', name);
+                res.header('email', email);
+                res.header('token', token);
+                return res.redirect(
+                    "http://localhost:3000?name="+name+"&email="+email+"&token="+token
+                );
+                // return Utils.getJsonResponse(200, '', data, res);
 
             }
         )(req,res);
