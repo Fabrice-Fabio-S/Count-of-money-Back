@@ -94,13 +94,15 @@ module.exports = {
                     { rdn: randomstring.generate({ length: 26, charset: 'alphanumeric'}) },
                     config.secret);
 
-                const name= response.displayName;
+                const firstname= response.name.familyName;
+                const lastname= response.name.givenName;
                 const email= response.emails[0].value;
-                res.header('name', name);
+                res.header('lastname', lastname);
+                res.header('firstname', firstname);
                 res.header('email', email);
                 res.header('token', token);
                 return res.redirect(
-                    "http://localhost:3000?name="+name+"&email="+email+"&token="+token
+                    "http://localhost:3000?lastname="+lastname+"&firstname="+firstname+"&email="+email+"&token="+token
                 );
                 // return Utils.getJsonResponse(200, '', data, res);
 
