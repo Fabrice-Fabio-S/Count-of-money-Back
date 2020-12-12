@@ -5,7 +5,14 @@ const pathParams = "tickers";
 const queryParams = "symbols=";
 const express = require("express");
 const Utils = require("../config/Utils");
-const app = express();
+const app = express()
+const CryptoModel = require('./../models/CryptoModel')
+const moment = require('moment')
+const PERIOD = {
+    DAILY: "daily",
+    HOURLY: "hourly",
+    MINUTE: "minute"
+}
 
 function create_crypto(data) {
   let cryptos = [];
@@ -46,23 +53,113 @@ function create_crypto(data) {
   return cryptos;
 }
 
-module.exports = {
-  fetch: (req, res, next) => {
+function save_cryptos(cryptos) {
+    cryptos.forEach((obj) => {
+        CryptoModel.create(obj)
+    })
+}
+
+function fetch_crypto_by_period(name, period_amount, period_unit) {
+    const oldestTimestamp = moment().subtract(period_amount, period_unit)
     try {
-      let cryptos = req.body.params ? req.body.params : "ALL";
-      console.log(`${url}/${pathParams}?${queryParams}${cryptos}`);
-      axios
-        .get(`${url}/${pathParams}?${queryParams}${cryptos}`)
-        .then((data) => {
-          let cryptos = create_crypto(data.data);
-          return Utils.getJsonResponse(200, "", cryptos, res);
-        })
-        .catch((err) => {
-          return Utils.getJsonResponse(403, "Cryptos not fetched", err, res);
-        });
+        return CryptoModel.find({
+            name,
+            createdAt: { $gt: oldestTimestamp }
+        }).exec()
     } catch (err) {
-      console.log(err);
-      return Utils.getJsonResponse(403, "Cryptos not fetched", err, res);
+        console.log(err)
+    }
+}
+
+module.exports = {
+    fetch: (req ,res) => {
+        try {
+            console.log(`${url}/${pathParams}?${queryParams}`)
+            axios.get(`${url}/${pathParams}?${queryParams}`)
+                .then(data => {
+                    let cryptos = create_crypto(data.data)
+                    return Utils.getJsonResponse(200, '', cryptos, res);
+                })
+                .catch(
+                    err => {
+                        return Utils.getJsonResponse(403, 'Cryptos not fetched', err, res);
+                    }
+                )
+        } catch (err) {
+            console.log(err)
+            return Utils.getJsonResponse(403, 'Cryptos not fetched', err, res);
+        }
+    },
+    fetchOne: (req ,res, next) => {
+        try {
+            let cmid = req.params.cmid
+            let queryParams = cmid
+            let pathParams = 'ticker'
+            console.log(`${url}/${pathParams}/${queryParams}`)
+            axios.get(`${url}/${pathParams}/${queryParams}`)
+                .then(data => {
+                    data.data.unshift(queryParams)
+                    let cryptos = create_crypto([data.data])
+                    return Utils.getJsonResponse(200, '', cryptos, res);
+                })
+                .catch(
+                    err => {
+                        return Utils.getJsonResponse(403, 'Cryptos not fetched', err, res);
+                    }
+                )
+        } catch (err) {
+            console.log(err)
+            return Utils.getJsonResponse(403, 'Cryptos not fetched', err, res);
+        }
+    },
+    intervalFetchCryptos: (req, res, next) => {
+        try {
+            console.log(`${url}/${pathParams}?${queryParams}`)
+            axios.get(`${url}/${pathParams}?${queryParams}`)
+                .then(data => {
+                    let cryptos = create_crypto(data.data)
+                    save_cryptos(cryptos)
+                    return
+                })
+                .catch(
+                    err => {
+                        console.log(err)
+                        return
+                    }
+                )
+        } catch (err) {
+            console.log(err)
+            return
+        }
+    },
+    sendCryptos: (req, res, next) => {
+        try {
+            let cmid = req.params.cmid;
+            let period = req.params.period;
+            let period_amount, period_unit
+            switch (period) {
+                case PERIOD.HOURLY:
+                    period_amount = 48
+                    period_unit = 'hours'
+                    break
+                case PERIOD.DAILY:
+                    period_amount = 60
+                    period_unit = 'days'
+                    break
+                case PERIOD.MINUTE:
+                    period_amount = 2
+                    period_unit = 'hours'
+                    break
+            }
+            console.log(cmid, period, period_amount, period_unit)
+            fetch_crypto_by_period(cmid, period_amount, period_unit)
+                .then(data => {
+                    console.log("data: " + data)
+                    return Utils.getJsonResponse(200, '', data, res)
+                })
+        } catch (err) {
+            return Utils.getJsonResponse(403, 'Crypto not fetched', err, res)
+        }
     }
   },
 };
