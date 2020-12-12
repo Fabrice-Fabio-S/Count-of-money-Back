@@ -40,5 +40,5 @@ RequestType : Get
 Routes : api/cryptos/:cmid/history/:period
 Params :
   cmid
-  period in ['hourly', 'monthly', 'daily']
+  period in ['hourly', 'minute', 'daily']
 ```
