@@ -158,21 +158,21 @@ module.exports = {
           // if user with this email exists return 403
           if (user) {
             // user already exist
-            return Utils.getJsonResponse(403, "User already exist", {}, res);
+              UserModel.updateParams(userId, email, lastname, firstname)
+                  .then((result) => {
+                      console.log("id : " + userId + " lastname : " + lastname);
+                      return Utils.getJsonResponse(
+                          200,
+                          "",
+                          { message: "User info has been update" },
+                          res
+                      );
+                  })
+                  .catch((err) => {
+                      return Utils.getJsonResponse(404, "User not found", {}, res);
+                  });
           } else {
-            UserModel.updateParams(userId, email, lastname, firstname)
-              .then((result) => {
-                console.log("id : " + userId + " lastname : " + lastname);
-                return Utils.getJsonResponse(
-                  200,
-                  "",
-                  { message: "User info has been update" },
-                  res
-                );
-              })
-              .catch((err) => {
-                return Utils.getJsonResponse(404, "User not found", {}, res);
-              });
+              return Utils.getJsonResponse(403, "User not found", {}, res);
           }
         });
       }
